@@ -1,37 +1,47 @@
 class App extends React.Component {
   constructor(props) {
     super(props);
+    // props.searchYouTube;
     this.state = {
       currentVideo: window.exampleVideoData[0],
       videoList: window.exampleVideoData,
+      value: '',
     };
+    this.onButtonClick = this.onButtonClick.bind(this);
+    this.changeVideo = this.changeVideo.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
   
-  onButtonClick(query) {
+  handleChange(event) {
+    console.log(event.target.value);
+    this.setState({
+      value: event.target.value
+    });
+    this.onButtonClick(this.state['value']);
+  }
+  
+  onButtonClick(event) {
     var options = {
-      part: 'snippet',
       key: window.YOUTUBE_API_KEY,
-      type: 'video',
       max: 5,
-      videoEmbeddable: true,
-      q: query,
+      query: event,
     };
-    searchYouTube(options, function(data) { console.log(data); });
+    var that = this;
+    searchYouTube(options, function(data) { that.setState({currentVideo: data[0], videoList: data}); });
   }
   
-  onClick(video) {
+  changeVideo(video) {
     this.setState({
       currentVideo: video
     });
   }
   
   render() {
-    // searchYouTube({ key: window.YOUTUBE_API_KEY, query: 'cats', max: 10}, function() {});
     return (
       <div>
         <nav className="navbar">
           <div className="col-md-6 offset-md-3">
-            <Search onClick={this.onButtonClick.bind(this)} />
+            <Search onClick={this.onButtonClick} value={this.state.value} onChange={this.handleChange}/>
           </div>
         </nav>
         <div className="row">
@@ -39,11 +49,22 @@ class App extends React.Component {
             <VideoPlayer video={this.state.currentVideo}/>
           </div>
           <div className="col-md-5">
-            <VideoList videos={this.state.videoList} onClick={this.onClick.bind(this)}/>
+            <VideoList videos={this.state.videoList} onClick={this.changeVideo} />
           </div>
         </div>
       </div>
     );
+  }
+  
+  componentDidMount() {
+    var that = this;
+    that.props.searchYouTube({
+      key: window.YOUTUBE_API_KEY,
+      max: 5,
+      query: ' ',
+    }, function(data) {
+      that.setState({currentVideo: data[0], videoList: data});
+    });
   }
 }
 
