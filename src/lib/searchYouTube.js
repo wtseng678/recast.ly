@@ -4,9 +4,8 @@ var searchYouTube = (options, callback) => {
     'q': options.query,
     'maxResults': options.max,
     'part': 'snippet',
-    'videoEmbeddable': true,
+    'embeddable': true,
     'type': 'video',
-    'dataType': 'json',
   };
   
   $.get('https://www.googleapis.com/youtube/v3/search', obj, function(data) {
